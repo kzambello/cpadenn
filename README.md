@@ -1,11 +1,11 @@
-# qcd_tools
-Package providing classes for Padé Neural Networks
+# cpadenn
+Package providing classes for Complex Padé Neural Networks
 
 Install with:
 ```
-pip install git+https://github.com/kzambello/PadeNN
+pip install git+https://github.com/kzambello/cpadenn
 ```
 or:
 ```
-pip install git+ssh://git@github.com/kzambello/PadeNN.git
+pip install git+ssh://git@github.com/kzambello/cpadenn.git
 ```

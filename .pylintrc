@@ -1,0 +1,4 @@
+[BASIC]
+
+# Good variable names which should always be accepted, separated by a comma.
+good-names=Layers, Models, Utils, CPadeAF_calibration, FindLocMax, Xg, Yg, Zg

@@ -13,28 +13,35 @@
 
 """Module providing models for a Pade neural network."""
 
-import numpy as np
 import tensorflow as tf
 
-import PadeNN
 from PadeNN import Layers, Utils
 
+
 class PadeModel(tf.keras.Model):
-    def __init__(self, lreg=1.0e-3):
+    """Complex Pade model."""
+
+    def __init__(self, lreg=1.0e-3, safe=False):
         super().__init__()
 
         self.cfugacitycov = Layers.CFugacityCoV()
-        
+
         self.cdense1 = Layers.CDense(units=8, lreg=lreg)
-        self.cpadeaf1 = Layers.CPadeAF(deg_num=4, deg_den=4, lreg=lreg, alphas=Utils.GetAlphas(4))
-        
+        self.cpadeaf1 = Layers.CPadeAF(
+            deg_num=4, deg_den=4, lreg=lreg, alphas=Utils.get_alphas(4), safe=safe
+        )
+
         self.cdense2 = Layers.CDense(units=4, lreg=lreg)
-        self.cpadeaf2 = Layers.CPadeAF(deg_num=4, deg_den=4, lreg=lreg, alphas=Utils.GetAlphas(4))
-        
+        self.cpadeaf2 = Layers.CPadeAF(
+            deg_num=4, deg_den=4, lreg=lreg, alphas=Utils.get_alphas(4), safe=safe
+        )
+
         self.cdense3 = Layers.CDense(units=1, lreg=lreg)
         self.csplitreim = Layers.CSplitReIm()
-            
+
     def call(self, inputs):
+        """Call method."""
+
         x = self.cfugacitycov(inputs)
         x = self.cdense1(x)
         x = self.cpadeaf1(x)
@@ -45,28 +52,72 @@ class PadeModel(tf.keras.Model):
 
         return x
 
-class BaselineModel(tf.keras.Model):
+
+class Baseline1Model(tf.keras.Model):
+    """Complex ReLU model."""
+
     def __init__(self, lreg=1.0e-3):
         super().__init__()
 
         self.cfugacitycov = Layers.CFugacityCoV()
-        
+
         self.cdense1 = Layers.CDense(units=8, lreg=lreg)
-        self.creluaf1 = Layers.CReLuAF()
-        
+        self.creluaf1 = Layers.CReLUAF()
+
         self.cdense2 = Layers.CDense(units=4, lreg=lreg)
-        self.creluaf2 = Layers.CReLuAF()
-        
+        self.creluaf2 = Layers.CReLUAF()
+
         self.cdense3 = Layers.CDense(units=1, lreg=lreg)
         self.csplitreim = Layers.CSplitReIm()
-            
+
     def call(self, inputs):
+        """Call method."""
+
         x = self.cfugacitycov(inputs)
         x = self.cdense1(x)
-        x = self.crelu1(x)
+        x = self.creluaf1(x)
         x = self.cdense2(x)
-        x = self.crelu2(x)
+        x = self.creluaf2(x)
         x = self.cdense3(x)
+        x = self.csplitreim(x)
+
+        return x
+
+
+class Baseline2Model(tf.keras.Model):
+    """
+       Complex ReLU model with approximately same number of trainable parameters
+       as Complex Pade model.
+    """
+
+    def __init__(self, lreg=1.0e-3):
+        super().__init__()
+
+        self.cfugacitycov = Layers.CFugacityCoV()
+
+        self.cdense1 = Layers.CDense(units=8, lreg=lreg)
+        self.creluaf1 = Layers.CReLUAF()
+
+        self.cdense2 = Layers.CDense(units=4, lreg=lreg)
+        self.creluaf2 = Layers.CReLUAF()
+
+        self.cdense3 = Layers.CDense(units=4, lreg=lreg)
+        self.creluaf3 = Layers.CReLUAF()
+
+        self.cdense4 = Layers.CDense(units=1, lreg=lreg)
+        self.csplitreim = Layers.CSplitReIm()
+
+    def call(self, inputs):
+        """Call method."""
+
+        x = self.cfugacitycov(inputs)
+        x = self.cdense1(x)
+        x = self.creluaf1(x)
+        x = self.cdense2(x)
+        x = self.creluaf2(x)
+        x = self.cdense3(x)
+        x = self.creluaf3(x)
+        x = self.cdense4(x)
         x = self.csplitreim(x)
 
         return x
