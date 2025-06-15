@@ -15,7 +15,7 @@
 
 import tensorflow as tf
 
-from PadeNN import Layers, Utils
+from cpadenn import Layers, Utils
 
 
 class PadeModel(tf.keras.Model):

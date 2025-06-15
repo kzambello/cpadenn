@@ -18,7 +18,7 @@ from scipy import ndimage
 
 import tensorflow as tf
 
-import PadeNN
+import cpadenn
 
 def FindLocMax(Xg, Yg, obs, size=16):
     """Find local maximums for observable obs."""
@@ -66,19 +66,19 @@ def modrelu(z, b=0.0):
 # Exempli gratia:
 #
 # def crelu(z):
-#    return PadeNN.Utils.ccardioid(z)
+#    return cpadenn.Utils.ccardioid(z)
 #
-# alphas11 = PadeNN.Utils.CPadeAF_calibration(1, 1, crelu)
-# alphas_safe11 = PadeNN.Utils.CPadeAF_calibration(1, 1, crelu, safe=True)
+# alphas11 = cpadenn.Utils.CPadeAF_calibration(1, 1, crelu)
+# alphas_safe11 = cpadenn.Utils.CPadeAF_calibration(1, 1, crelu, safe=True)
 #
-# alphas22 = PadeNN.Utils.CPadeAF_calibration(2, 2, crelu)
-# alphas_safe22 = PadeNN.Utils.CPadeAF_calibration(2, 2, crelu, safe=True)
+# alphas22 = cpadenn.Utils.CPadeAF_calibration(2, 2, crelu)
+# alphas_safe22 = cpadenn.Utils.CPadeAF_calibration(2, 2, crelu, safe=True)
 #
-# alphas33 = PadeNN.Utils.CPadeAF_calibration(3, 3, crelu)
-# alphas_safe33 = PadeNN.Utils.CPadeAF_calibration(3, 3, crelu, safe=True)
+# alphas33 = cpadenn.Utils.CPadeAF_calibration(3, 3, crelu)
+# alphas_safe33 = cpadenn.Utils.CPadeAF_calibration(3, 3, crelu, safe=True)
 #
-# alphas44 = PadeNN.Utils.CPadeAF_calibration(4, 4, crelu)
-# alphas_safe44 = PadeNN.Utils.CPadeAF_calibration(4, 4, crelu, safe=True)
+# alphas44 = cpadenn.Utils.CPadeAF_calibration(4, 4, crelu)
+# alphas_safe44 = cpadenn.Utils.CPadeAF_calibration(4, 4, crelu, safe=True)
 
 
 def CPadeAF_calibration(deg_num, deg_den, crelu, safe=False):
@@ -87,8 +87,8 @@ def CPadeAF_calibration(deg_num, deg_den, crelu, safe=False):
     inputs = tf.keras.layers.Input(shape=(2,))
 
     x = inputs
-    x = PadeNN.Layers.CMergeReIm()(x)
-    x = PadeNN.Layers.CPadeAF(
+    x = cpadenn.Layers.CMergeReIm()(x)
+    x = cpadenn.Layers.CPadeAF(
         deg_num=deg_num,
         deg_den=deg_den,
         lreg=1.0e-3,
@@ -96,7 +96,7 @@ def CPadeAF_calibration(deg_num, deg_den, crelu, safe=False):
         istddev=1.0e-4,
         safe=safe,
     )(x)
-    x = PadeNN.Layers.CSplitReIm()(x)
+    x = cpadenn.Layers.CSplitReIm()(x)
 
     outputs = x
 
