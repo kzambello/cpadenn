@@ -1,7 +1,7 @@
 from setuptools import setup
 
-setup(name='PadeNN',
+setup(name='cpadenn',
     version='0.1.0',
-    packages=['PadeNN'],
-    install_requires=['scikit-learn','tensorflow'],
+    packages=['cpadenn'],
+    install_requires=['numpy','scikit-learn','scipy','tensorflow'],
 )

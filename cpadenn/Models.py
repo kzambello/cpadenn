@@ -53,7 +53,7 @@ class PadeModel(tf.keras.Model):
         return x
 
 
-class Baseline1Model(tf.keras.Model):
+class BaselineModel1(tf.keras.Model):
     """Complex ReLU model."""
 
     def __init__(self, lreg=1.0e-3):
@@ -84,7 +84,7 @@ class Baseline1Model(tf.keras.Model):
         return x
 
 
-class Baseline2Model(tf.keras.Model):
+class BaselineModel2(tf.keras.Model):
     """
        Complex ReLU model with approximately same number of trainable parameters
        as Complex Pade model.

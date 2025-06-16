@@ -20,6 +20,7 @@ import tensorflow as tf
 
 import cpadenn
 
+
 def FindLocMax(Xg, Yg, obs, size=16):
     """Find local maximums for observable obs."""
 
@@ -126,34 +127,52 @@ def CPadeAF_calibration(deg_num, deg_den, crelu, safe=False):
 
 def get_alphas(n):
     """Return precomputed initial weights for (unsafe) Complex Pade activation
-       function of order n/n.
+    function of order n/n.
     """
 
-    if n == 4:
+    if n == 1:
+        alphas = [
+            np.array([0.44639155, 0.5874375], dtype=np.float32),
+            np.array([-0.11688029], dtype=np.float32),
+            np.array([-0.00164319, 0.00171649], dtype=np.float32),
+            np.array([0.00100579], dtype=np.float32),
+        ]
+    elif n == 2:
+        alphas = [
+            np.array([0.4516767, 0.05266491, 0.5457554], dtype=np.float32),
+            np.array([-0.08004141, 0.01517201], dtype=np.float32),
+            np.array([-0.00038721, -0.00039545, -0.0014949], dtype=np.float32),
+            np.array([-0.00040207, -0.00024268], dtype=np.float32),
+        ]
+    elif n == 3:
+        alphas = [
+            np.array([0.38862282, 0.00826987, 0.00152397, 0.5423925], dtype=np.float32),
+            np.array([-0.20875129, 0.0437681, -0.00415791], dtype=np.float32),
+            np.array(
+                [0.00055318, -0.00013447, -0.00018349, 0.00097038], dtype=np.float32
+            ),
+            np.array([0.00019213, 0.00013342, -0.00011132], dtype=np.float32),
+        ]
+    elif n == 4:
         alphas = [
             np.array(
-                [0.55991364, 0.14828739, 0.01649525, 0.00223316, 0.5429329],
+                [0.54397285, 0.1292388, 0.01105397, 0.00199061, 0.54465675],
                 dtype=np.float32,
             ),
             np.array(
-                [0.11221588, 0.00310184, 0.00828541, -0.0009095], dtype=np.float32
+                [0.08190799, -0.00250178, 0.00801145, -0.00114474], dtype=np.float32
             ),
             np.array(
-                [
-                    -6.2417763e-04,
-                    -6.3668203e-04,
-                    8.2182858e-05,
-                    1.6188879e-04,
-                    -5.9690198e-04,
-                ],
+                [-0.02204097, -0.01346053, 0.00094724, 0.00035264, 0.00064983],
                 dtype=np.float32,
             ),
             np.array(
-                [-1.0941960e-03, 2.2226348e-05, -2.5839164e-04, -1.7531947e-04],
+                [-3.8732085e-02, 9.0270257e-03, -1.7697400e-03, 9.7313503e-05],
                 dtype=np.float32,
             ),
         ]
-        return alphas
+    else:
+        print(f"WARNING: no precomputed alphas for n = {n}, returning None.")
+        return None
 
-    print(f"WARNING: no precomputed alphas for n = {n}, returning None.")
-    return None
+    return alphas
