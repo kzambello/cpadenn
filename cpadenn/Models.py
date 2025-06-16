@@ -86,8 +86,8 @@ class BaselineModel1(tf.keras.Model):
 
 class BaselineModel2(tf.keras.Model):
     """
-       Complex ReLU model with approximately same number of trainable parameters
-       as Complex Pade model.
+    Complex ReLU model with approximately same number of trainable parameters
+    as Complex Pade model.
     """
 
     def __init__(self, lreg=1.0e-3):
@@ -98,13 +98,10 @@ class BaselineModel2(tf.keras.Model):
         self.cdense1 = Layers.CDense(units=8, lreg=lreg)
         self.creluaf1 = Layers.CReLUAF()
 
-        self.cdense2 = Layers.CDense(units=4, lreg=lreg)
+        self.cdense2 = Layers.CDense(units=6, lreg=lreg)
         self.creluaf2 = Layers.CReLUAF()
 
-        self.cdense3 = Layers.CDense(units=4, lreg=lreg)
-        self.creluaf3 = Layers.CReLUAF()
-
-        self.cdense4 = Layers.CDense(units=1, lreg=lreg)
+        self.cdense3 = Layers.CDense(units=1, lreg=lreg)
         self.csplitreim = Layers.CSplitReIm()
 
     def call(self, inputs):
@@ -116,8 +113,6 @@ class BaselineModel2(tf.keras.Model):
         x = self.cdense2(x)
         x = self.creluaf2(x)
         x = self.cdense3(x)
-        x = self.creluaf3(x)
-        x = self.cdense4(x)
         x = self.csplitreim(x)
 
         return x

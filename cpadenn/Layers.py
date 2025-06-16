@@ -207,7 +207,7 @@ class CPadeAF(tf.keras.layers.Layer):
 
 
 # complex cardioid, https://arxiv.org/abs/1707.00070
-class CReLUAF(tf.keras.layers.Layer):
+class CReLUAF_ccardioid(tf.keras.layers.Layer):
     """Complex ReLU activation function (based on complex cardioid)."""
 
     def __init__(self):
@@ -224,6 +224,28 @@ class CReLUAF(tf.keras.layers.Layer):
         return res
 
 
+# zrelu, https://arxiv.org/abs/1602.09046
+class CReLUAF_zrelu(tf.keras.layers.Layer):
+    """Complex ReLU activation function (based on zrelu)."""
+
+    def __init__(self):
+        super().__init__()
+
+    def call(self, x):
+        """Call method."""
+
+        xangle = tf.math.angle(x)
+        pi_half = tf.constant(3.141592653589793 / 2.0, dtype=tf.float64)
+        mybool = tf.logical_and(xangle > 0.0, xangle < pi_half)
+        mybool = tf.cast(mybool, dtype=tf.complex128)
+        res = mybool * x
+        return res
+
+
+# alias
+CReLUAF = CReLUAF_ccardioid
+
+
 class CSplitReIm(tf.keras.layers.Layer):
     """Split real and imaginary parts."""
 
@@ -231,7 +253,7 @@ class CSplitReIm(tf.keras.layers.Layer):
         super().__init__()
 
     def call(self, inputs):
-        """ Call method."""
+        """Call method."""
 
         inputs_c = inputs[:]
 
