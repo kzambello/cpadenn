@@ -21,10 +21,13 @@ from cpadenn import Layers, Utils
 class PadeModel(tf.keras.Model):
     """Complex Pade model."""
 
-    def __init__(self, lreg=1.0e-3, safe=False):
+    def __init__(self, lreg=1.0e-3, safe=False, fugacity=True):
         super().__init__()
 
-        self.cfugacitycov = Layers.CFugacityCoV()
+        if fugacity:
+            self.cmergereim = Layers.CFugacityCoV()
+        else:
+            self.cmergereim = Layers.CMergeReIm()
 
         self.cdense1 = Layers.CDense(units=8, lreg=lreg)
         self.cpadeaf1 = Layers.CPadeAF(
@@ -42,7 +45,7 @@ class PadeModel(tf.keras.Model):
     def call(self, inputs):
         """Call method."""
 
-        x = self.cfugacitycov(inputs)
+        x = self.cmergereim(inputs)
         x = self.cdense1(x)
         x = self.cpadeaf1(x)
         x = self.cdense2(x)
@@ -56,10 +59,13 @@ class PadeModel(tf.keras.Model):
 class BaselineModel1(tf.keras.Model):
     """Complex ReLU model."""
 
-    def __init__(self, lreg=1.0e-3):
+    def __init__(self, lreg=1.0e-3, fugacity=True):
         super().__init__()
 
-        self.cfugacitycov = Layers.CFugacityCoV()
+        if fugacity:
+            self.cmergereim = Layers.CFugacityCoV()
+        else:
+            self.cmergereim = Layers.CMergeReIm()
 
         self.cdense1 = Layers.CDense(units=8, lreg=lreg)
         self.creluaf1 = Layers.CReLUAF()
@@ -73,7 +79,7 @@ class BaselineModel1(tf.keras.Model):
     def call(self, inputs):
         """Call method."""
 
-        x = self.cfugacitycov(inputs)
+        x = self.cmergereim(inputs)
         x = self.cdense1(x)
         x = self.creluaf1(x)
         x = self.cdense2(x)
@@ -90,10 +96,13 @@ class BaselineModel2(tf.keras.Model):
     as Complex Pade model.
     """
 
-    def __init__(self, lreg=1.0e-3):
+    def __init__(self, lreg=1.0e-3, fugacity=True):
         super().__init__()
 
-        self.cfugacitycov = Layers.CFugacityCoV()
+        if fugacity:
+            self.cmergereim = Layers.CFugacityCoV()
+        else:
+            self.cmergereim = Layers.CMergeReIm()
 
         self.cdense1 = Layers.CDense(units=8, lreg=lreg)
         self.creluaf1 = Layers.CReLUAF()
@@ -107,7 +116,7 @@ class BaselineModel2(tf.keras.Model):
     def call(self, inputs):
         """Call method."""
 
-        x = self.cfugacitycov(inputs)
+        x = self.cmergereim(inputs)
         x = self.cdense1(x)
         x = self.creluaf1(x)
         x = self.cdense2(x)
