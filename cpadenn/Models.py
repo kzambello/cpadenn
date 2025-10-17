@@ -125,3 +125,54 @@ class BaselineModel2(tf.keras.Model):
         x = self.csplitreim(x)
 
         return x
+
+
+class CustomModel(tf.keras.Model):
+    """Complex custom model."""
+
+    def __init__(self, lreg=1.0e-3, fugacity=True, units=[8, 4], n=4, safe=False):
+        super().__init__()
+
+        if fugacity:
+            self.cmergereim = Layers.CFugacityCoV()
+        else:
+            self.cmergereim = Layers.CMergeReIm()
+
+        self.hidden_layers = []
+
+        for u in units:
+            self.hidden_layers.append(Layers.CDense(units=u, lreg=lreg))
+
+            if n == 0:
+                self.hidden_layers.append(Layers.CReLUAF())
+            else:
+                if n > 4:
+                    n = 4
+                    print(
+                        f"WARNING: requested Pade activation function of order n = {n} > 4, overriding to n = 4."
+                    )
+                self.hidden_layers.append(
+                    Layers.CPadeAF(
+                        deg_num=n,
+                        deg_den=n,
+                        lreg=lreg,
+                        alphas=Utils.get_alphas(n),
+                        safe=safe,
+                    )
+                )
+
+        self.cdense = Layers.CDense(units=1, lreg=lreg)
+        self.csplitreim = Layers.CSplitReIm()
+
+    def call(self, inputs):
+        """Call method."""
+
+        x = self.cmergereim(inputs)
+
+        for layer in self.hidden_layers:
+            x = layer(x)
+
+        x = self.cdense(x)
+        x = self.csplitreim(x)
+
+        return x
