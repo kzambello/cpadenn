@@ -130,8 +130,25 @@ class CPadeAF(tf.keras.layers.Layer):
     ):
         super().__init__()
 
+        # The variable safe_kind is hard-coded, for now. Available options are:
+        #
+        #    SPAU:  complexified version of https://arxiv.org/pdf/1907.06732
+        #    ERA:   complexified version of https://www.ecva.net/papers/eccv_2022/papers_ECCV/papers/136800705.pdf
+        #    modERA: ERA modified to not have zeros on imaginary (instead of real) axis
+        #
+
+        self.safe_kind = "SPAU"
+
         self.deg_num = deg_num
         self.deg_den = deg_den
+
+        if (self.safe_kind == "ERA" or self.safe_kind == "modERA") and safe is True:
+            new_deg_den = deg_den / 2.0
+            new_deg_den = int(2 * round(new_deg_den / 2))  # closest even int
+            self.deg_den = new_deg_den
+            print(
+                f"Warning: using experimental {self.safe_kind} rational function, adjusting internal deg_den from {deg_den} to {new_deg_den}. Effective degree is {2*new_deg_den}."
+            )
 
         self.lreg = lreg
         self.alphas = alphas
@@ -185,6 +202,9 @@ class CPadeAF(tf.keras.layers.Layer):
         coeffs_num_c = tf.cast(coeffs_num_c, tf.complex128)
         coeffs_den_c = tf.cast(coeffs_den_c, tf.complex128)
         one_c = tf.cast(tf.complex(1.0, 0.0), tf.complex128)
+        onej_c = tf.cast(tf.complex(0.0, 1.0), tf.complex128)
+        zero_c = tf.cast(tf.complex(0.0, 0.0), tf.complex128)
+        epsilon_c = tf.cast(tf.complex(1.0e-6, 0.0), tf.complex128)
 
         numerator = tf.add_n(
             [coeffs_num_c[i] * tf.pow(inputs_c, i + 1) for i in range(self.deg_num)]
@@ -195,11 +215,57 @@ class CPadeAF(tf.keras.layers.Layer):
             [coeffs_den_c[i] * tf.pow(inputs_c, i + 1) for i in range(self.deg_den)]
         )
 
-        if self.safe is True:
+        if self.safe is True and self.safe_kind == "SPAU":
             absden = tf.sqrt(denominator * tf.math.conj(denominator))
             denominator = tf.cast(absden, tf.complex128) + one_c
         else:
             denominator = denominator + one_c
+
+        if self.safe is True and self.safe_kind == "ERA":
+            denominator = one_c
+            for i in range(self.deg_den):
+                # term = (z+c)^2 + d^2
+                c = tf.cast(
+                    tf.complex(
+                        tf.math.real(coeffs_den_c[i]),
+                        tf.constant(0.0, dtype=tf.float64),
+                    ),
+                    tf.complex128,
+                )
+                d = tf.cast(
+                    tf.complex(
+                        tf.math.imag(coeffs_den_c[i]),
+                        tf.constant(0.0, dtype=tf.float64),
+                    ),
+                    tf.complex128,
+                )
+                term = tf.pow(inputs_c - c, 2) + tf.pow(d, 2)
+                denominator = tf.multiply(denominator, term)
+
+            denominator = denominator + epsilon_c
+
+        if self.safe is True and self.safe_kind == "modERA":
+            denominator = one_c
+            for i in range(self.deg_den):
+                # term = -(z+ic)^2 + d^2
+                c = tf.cast(
+                    tf.complex(
+                        tf.math.real(coeffs_den_c[i]),
+                        tf.constant(0.0, dtype=tf.float64),
+                    ),
+                    tf.complex128,
+                )
+                d = tf.cast(
+                    tf.complex(
+                        tf.math.imag(coeffs_den_c[i]),
+                        tf.constant(0.0, dtype=tf.float64),
+                    ),
+                    tf.complex128,
+                )
+                term = -tf.pow(inputs_c - onej_c * c, 2) + tf.pow(d, 2)
+                denominator = tf.multiply(denominator, term)
+
+            denominator = denominator + epsilon_c
 
         res = tf.math.divide_no_nan(numerator, denominator)
 
