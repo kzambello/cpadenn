@@ -142,7 +142,7 @@ class CPadeAF(tf.keras.layers.Layer):
         self.deg_num = deg_num
         self.deg_den = deg_den
 
-        if (self.safe_kind == "ERA" or self.safe_kind == "modERA") and safe is True:
+        if self.safe_kind in ('ERA', 'modERA') and safe is True:
             new_deg_den = deg_den / 2.0
             new_deg_den = int(2 * round(new_deg_den / 2))  # closest even int
             self.deg_den = new_deg_den
@@ -203,7 +203,6 @@ class CPadeAF(tf.keras.layers.Layer):
         coeffs_den_c = tf.cast(coeffs_den_c, tf.complex128)
         one_c = tf.cast(tf.complex(1.0, 0.0), tf.complex128)
         onej_c = tf.cast(tf.complex(0.0, 1.0), tf.complex128)
-        zero_c = tf.cast(tf.complex(0.0, 0.0), tf.complex128)
         epsilon_c = tf.cast(tf.complex(1.0e-6, 0.0), tf.complex128)
 
         numerator = tf.add_n(

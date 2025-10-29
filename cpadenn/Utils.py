@@ -126,8 +126,8 @@ def CPadeAF_calibration(deg_num, deg_den, crelu, safe=False):
 
 
 def get_alphas(n, safe=False):
-    """Return precomputed initial weights for (unsafe) Complex Pade activation
-    function of order n/n.
+    """
+    Return precomputed initial weights for Complex Pade activation function of order n/n.
     """
 
     if safe is True:

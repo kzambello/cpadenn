@@ -157,7 +157,7 @@ class CustomModel(tf.keras.Model):
                 if n > 4:
                     n = 4
                     print(
-                        f"WARNING: requested Pade activation function of order n = {n} > 4, overriding to n = 4."
+                        f"WARNING: requested Complex Pade activation function of order n = {n} > 4, overriding to n = 4."
                     )
                 self.hidden_layers.append(
                     Layers.CPadeAF(
