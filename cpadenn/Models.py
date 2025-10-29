@@ -31,12 +31,20 @@ class PadeModel(tf.keras.Model):
 
         self.cdense1 = Layers.CDense(units=8, lreg=lreg)
         self.cpadeaf1 = Layers.CPadeAF(
-            deg_num=4, deg_den=4, lreg=lreg, alphas=Utils.get_alphas(4, safe=safe), safe=safe
+            deg_num=4,
+            deg_den=4,
+            lreg=lreg,
+            alphas=Utils.get_alphas(4, safe=safe),
+            safe=safe,
         )
 
         self.cdense2 = Layers.CDense(units=4, lreg=lreg)
         self.cpadeaf2 = Layers.CPadeAF(
-            deg_num=4, deg_den=4, lreg=lreg, alphas=Utils.get_alphas(4, safe=safe), safe=safe
+            deg_num=4,
+            deg_den=4,
+            lreg=lreg,
+            alphas=Utils.get_alphas(4, safe=safe),
+            safe=safe,
         )
 
         self.cdense3 = Layers.CDense(units=1, lreg=lreg)
