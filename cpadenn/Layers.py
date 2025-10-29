@@ -142,12 +142,14 @@ class CPadeAF(tf.keras.layers.Layer):
         self.deg_num = deg_num
         self.deg_den = deg_den
 
-        if self.safe_kind in ('ERA', 'modERA') and safe is True:
+        if self.safe_kind in ("ERA", "modERA") and safe is True:
             new_deg_den = deg_den / 2.0
             new_deg_den = int(2 * round(new_deg_den / 2))  # closest even int
             self.deg_den = new_deg_den
             print(
-                f"Warning: using experimental {self.safe_kind} rational function, adjusting internal deg_den from {deg_den} to {new_deg_den}. Effective degree is {2*new_deg_den}."
+                f"WARNING: using experimental {self.safe_kind} rational function, adjusting "
+                f"internal deg_den from {deg_den} to {new_deg_den}. Effective degree is "
+                f"{2*new_deg_den}."
             )
 
         self.lreg = lreg

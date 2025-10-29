@@ -132,7 +132,8 @@ def get_alphas(n, safe=False):
 
     if safe is True:
         print(
-            "WARNING: no precomputed alphas for safe Complex Pade activation functions, returning None."
+            "WARNING: no precomputed alphas for safe Complex Pade activation functions, returning "
+            "None."
         )
         return None
 

@@ -138,8 +138,11 @@ class BaselineModel2(tf.keras.Model):
 class CustomModel(tf.keras.Model):
     """Complex custom model."""
 
-    def __init__(self, lreg=1.0e-3, fugacity=True, units=[8, 4], n=4, safe=False):
+    def __init__(self, lreg=1.0e-3, fugacity=True, units=None, n=4, safe=False):
         super().__init__()
+
+        if units is None:
+            units = [8, 4]  # default value
 
         if fugacity:
             self.cmergereim = Layers.CFugacityCoV()
@@ -157,7 +160,8 @@ class CustomModel(tf.keras.Model):
                 if n > 4:
                     n = 4
                     print(
-                        f"WARNING: requested Complex Pade activation function of order n = {n} > 4, overriding to n = 4."
+                        f"WARNING: requested Complex Pade activation function of order n = {n} > "
+                        f"4, overriding to n = 4."
                     )
                 self.hidden_layers.append(
                     Layers.CPadeAF(
