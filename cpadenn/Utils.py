@@ -125,10 +125,14 @@ def CPadeAF_calibration(deg_num, deg_den, crelu, safe=False):
     return alphas
 
 
-def get_alphas(n):
+def get_alphas(n, safe=False):
     """Return precomputed initial weights for (unsafe) Complex Pade activation
     function of order n/n.
     """
+
+    if safe is True:
+        print(f"WARNING: no precomputed alphas for safe Complex Pade activation functions, returning None.")
+        return None
 
     if n == 1:
         alphas = [
