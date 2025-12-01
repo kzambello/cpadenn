@@ -34,7 +34,7 @@ class PadeModel(tf.keras.Model):
             deg_num=4,
             deg_den=4,
             lreg=lreg,
-            alphas=Utils.get_alphas(4, safe=safe),
+            alphas=Utils.get_alphas(4, 4, safe=safe),
             safe=safe,
         )
 
@@ -43,7 +43,7 @@ class PadeModel(tf.keras.Model):
             deg_num=4,
             deg_den=4,
             lreg=lreg,
-            alphas=Utils.get_alphas(4, safe=safe),
+            alphas=Utils.get_alphas(4, 4, safe=safe),
             safe=safe,
         )
 
@@ -138,11 +138,21 @@ class BaselineModel2(tf.keras.Model):
 class CustomModel(tf.keras.Model):
     """Complex custom model."""
 
-    def __init__(self, lreg=1.0e-3, fugacity=True, units=None, n=4, safe=False):
+    def __init__(
+        self,
+        lreg=1.0e-3,
+        imean=0.0,
+        istddev=1.0,
+        dropout_rate=0.1,
+        fugacity=True,
+        units=None,
+        n=4,
+        safe=False,
+    ):
         super().__init__()
 
         if units is None:
-            units = [8, 4]  # default value
+            units = [4, 4, 1]  # default value
 
         if fugacity:
             self.cmergereim = Layers.CFugacityCoV()
@@ -152,28 +162,26 @@ class CustomModel(tf.keras.Model):
         self.hidden_layers = []
 
         for u in units:
-            self.hidden_layers.append(Layers.CDense(units=u, lreg=lreg))
+            self.hidden_layers.append(
+                Layers.CDense(units=u, lreg=lreg, imean=imean, istddev=istddev)
+            )
 
             if n == 0:
                 self.hidden_layers.append(Layers.CReLUAF())
             else:
-                if n > 4:
-                    n = 4
-                    print(
-                        f"WARNING: requested Complex Pade activation function of order n = {n} > "
-                        f"4, overriding to n = 4."
-                    )
                 self.hidden_layers.append(
                     Layers.CPadeAF(
                         deg_num=n,
                         deg_den=n,
                         lreg=lreg,
-                        alphas=Utils.get_alphas(n, safe=safe),
+                        alphas=Utils.get_alphas(n, n, safe=safe),
                         safe=safe,
                     )
                 )
 
-        self.cdense = Layers.CDense(units=1, lreg=lreg)
+            if dropout_rate != 0.0 and u > 1:
+                self.hidden_layers.append(Layers.CDropout(rate=dropout_rate))
+
         self.csplitreim = Layers.CSplitReIm()
 
     def call(self, inputs):
@@ -184,7 +192,6 @@ class CustomModel(tf.keras.Model):
         for layer in self.hidden_layers:
             x = layer(x)
 
-        x = self.cdense(x)
         x = self.csplitreim(x)
 
         return x

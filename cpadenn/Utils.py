@@ -125,33 +125,81 @@ def CPadeAF_calibration(deg_num, deg_den, crelu, safe=False):
     return alphas
 
 
-def get_alphas(n, safe=False):
+def get_alphas(n, m, safe=False):
     """
     Return precomputed initial weights for Complex Pade activation function of order n/n.
     """
 
     if safe is True:
-        print(
-            "WARNING: no precomputed alphas for safe Complex Pade activation functions, returning "
-            "None."
-        )
-        return None
+        if n == 3 and m == 3:
+            alphas = [
+                np.array(
+                    [0.7028826, 0.09448481, -0.00894883, 0.4818811], dtype=np.float32
+                ),
+                np.array([-0.09537569, 0.04550191, -0.00649218], dtype=np.float32),
+                np.array(
+                    [-0.00111217, 0.00048354, 0.00010253, 0.0013575], dtype=np.float32
+                ),
+                np.array([-0.1694703, 0.07872267, -0.01214926], dtype=np.float32),
+            ]
+        elif n == 3 and m == 2:
+            alphas = [
+                np.array(
+                    [0.57864904, 0.09365933, -0.00282509, 0.5841132], dtype=np.float32
+                ),
+                np.array([0.00041374, 0.00031814], dtype=np.float32),
+                np.array(
+                    [1.1065153e-03, -7.6211587e-04, -5.3236025e-05, -1.5721197e-04],
+                    dtype=np.float32,
+                ),
+                np.array([0.0626029, -0.01708659], dtype=np.float32),
+            ]
+        elif n == 4 and m == 4:
+            alphas = [
+                np.array(
+                    [0.7257368, 0.08196919, -0.01256165, 0.00140988, 0.37371516],
+                    dtype=np.float32,
+                ),
+                np.array(
+                    [0.16024841, -0.11743093, 0.0327547, -0.00313357], dtype=np.float32
+                ),
+                np.array(
+                    [
+                        -1.2159096e-03,
+                        8.8814850e-04,
+                        1.7775426e-04,
+                        -8.8957997e-05,
+                        1.4857965e-03,
+                    ],
+                    dtype=np.float32,
+                ),
+                np.array(
+                    [-0.11850382, 0.08703844, -0.02366448, 0.0029188], dtype=np.float32
+                ),
+            ]
+        else:
+            print(
+                f"WARNING: no precomputed alphas for (n,m) = ({n},{m}) returning None."
+            )
+            return None
 
-    if n == 1:
+        return alphas
+
+    if n == 1 and m == 1:
         alphas = [
             np.array([0.44639155, 0.5874375], dtype=np.float32),
             np.array([-0.11688029], dtype=np.float32),
             np.array([-0.00164319, 0.00171649], dtype=np.float32),
             np.array([0.00100579], dtype=np.float32),
         ]
-    elif n == 2:
+    elif n == 2 and m == 2:
         alphas = [
             np.array([0.4516767, 0.05266491, 0.5457554], dtype=np.float32),
             np.array([-0.08004141, 0.01517201], dtype=np.float32),
             np.array([-0.00038721, -0.00039545, -0.0014949], dtype=np.float32),
             np.array([-0.00040207, -0.00024268], dtype=np.float32),
         ]
-    elif n == 3:
+    elif n == 3 and m == 3:
         alphas = [
             np.array([0.38862282, 0.00826987, 0.00152397, 0.5423925], dtype=np.float32),
             np.array([-0.20875129, 0.0437681, -0.00415791], dtype=np.float32),
@@ -160,7 +208,16 @@ def get_alphas(n, safe=False):
             ),
             np.array([0.00019213, 0.00013342, -0.00011132], dtype=np.float32),
         ]
-    elif n == 4:
+    elif n == 3 and m == 2:
+        alphas = [
+            np.array([0.49811104, 0.09632787, 0.00930952, 0.5379451], dtype=np.float32),
+            np.array([-0.00268338, 0.0204672], dtype=np.float32),
+            np.array(
+                [0.00047284, -0.00017495, 0.00052347, 0.00051169], dtype=np.float32
+            ),
+            np.array([2.4028297e-05, -1.4469674e-04], dtype=np.float32),
+        ]
+    elif n == 4 and m == 4:
         alphas = [
             np.array(
                 [0.54397285, 0.1292388, 0.01105397, 0.00199061, 0.54465675],
@@ -179,7 +236,7 @@ def get_alphas(n, safe=False):
             ),
         ]
     else:
-        print(f"WARNING: no precomputed alphas for n = {n}, returning None.")
+        print(f"WARNING: no precomputed alphas for (n,m) = ({n},{m}) returning None.")
         return None
 
     return alphas
