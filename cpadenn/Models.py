@@ -135,6 +135,7 @@ class BaselineModel2(tf.keras.Model):
         return x
 
 
+
 class CustomModel(tf.keras.Model):
     """Complex custom model."""
 
@@ -147,6 +148,7 @@ class CustomModel(tf.keras.Model):
         fugacity=True,
         units=None,
         n=4,
+        m=4,
         safe=False,
     ):
         super().__init__()
@@ -166,15 +168,15 @@ class CustomModel(tf.keras.Model):
                 Layers.CDense(units=u, lreg=lreg, imean=imean, istddev=istddev)
             )
 
-            if n == 0:
+            if n == 0 or m == 0:
                 self.hidden_layers.append(Layers.CReLUAF())
             else:
                 self.hidden_layers.append(
                     Layers.CPadeAF(
                         deg_num=n,
-                        deg_den=n,
+                        deg_den=m,
                         lreg=lreg,
-                        alphas=Utils.get_alphas(n, n, safe=safe),
+                        alphas=Utils.get_alphas(n, m, safe=safe),
                         safe=safe,
                     )
                 )
@@ -187,10 +189,20 @@ class CustomModel(tf.keras.Model):
     def call(self, inputs):
         """Call method."""
 
-        x = self.cmergereim(inputs)
+        xp = self.cmergereim(inputs)
+        xm = self.cmergereim(-inputs)
+        xpdag = tf.math.conj(self.cmergereim(inputs))
+        xmdag = tf.math.conj(self.cmergereim(-inputs))
 
         for layer in self.hidden_layers:
-            x = layer(x)
+            xp = layer(xp)
+            xm = layer(xm)
+            xpdag = layer(xpdag)
+            xmdag = layer(xmdag)
+
+        x = tf.math.multiply(xpdag, tf.math.conj(xp)) - tf.math.multiply(xmdag, tf.math.conj(xm))
+
+        x = -tf.math.conj(x)
 
         x = self.csplitreim(x)
 
