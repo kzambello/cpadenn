@@ -135,7 +135,6 @@ class BaselineModel2(tf.keras.Model):
         return x
 
 
-
 class CustomModel(tf.keras.Model):
     """Complex custom model."""
 
@@ -200,7 +199,9 @@ class CustomModel(tf.keras.Model):
             xpdag = layer(xpdag)
             xmdag = layer(xmdag)
 
-        x = tf.math.multiply(xpdag, tf.math.conj(xp)) - tf.math.multiply(xmdag, tf.math.conj(xm))
+        x = tf.math.multiply(xpdag, tf.math.conj(xp)) - tf.math.multiply(
+            xmdag, tf.math.conj(xm)
+        )
 
         x = -tf.math.conj(x)
 
