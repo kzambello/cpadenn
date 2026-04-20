@@ -115,6 +115,27 @@ class CFugacityCoV(tf.keras.layers.Layer):
         return res
 
 
+class CIFugacityCoV(tf.keras.layers.Layer):
+    """Inverse fugacity change of variables."""
+
+    def __init__(self):
+        super().__init__()
+
+    def call(self, inputs):
+        """Call method."""
+
+        inputs_c = tf.complex(inputs[:, 0], inputs[:, 1])
+
+        inputs_c = tf.cast(inputs_c, tf.complex128)
+
+        res = tf.exp(-inputs_c)
+        res = tf.reshape(
+            res, (-1, 1)
+        )  # reshape output from (batch_size,) to (batch_size, 1)
+
+        return res
+
+
 class CPadeAF(tf.keras.layers.Layer):
     """Complex Pade activation function."""
 

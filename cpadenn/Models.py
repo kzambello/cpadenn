@@ -140,47 +140,58 @@ class CustomModel(tf.keras.Model):
 
     def __init__(
         self,
-        lreg=1.0e-3,
-        imean=0.0,
-        istddev=1.0,
-        dropout_rate=0.1,
-        fugacity=True,
+        lreg=1.0e-6,
+        imean=0.1,
+        istddev=1.0e-4,
+        dropout_rate=0.0,
+        fugacity=False,
+        ifugacity=False,
         units=None,
-        n=4,
-        m=4,
+        n=None,
+        m=None,
         safe=False,
     ):
         super().__init__()
 
         if units is None:
-            units = [4, 4, 1]  # default value
+            units = [4, 4, 1]  # default
+            n = [4, 4, -1]
+            m = [4, 4, -1]
+            safe = [False, False, False]
+
+        if fugacity and ifugacity:
+            print("WARNING: both fugacity and ifugacity set to True, using fugacity.")
 
         if fugacity:
             self.cmergereim = Layers.CFugacityCoV()
+        elif ifugacity:
+            self.cmergereim = Layers.CIFugacityCoV()
         else:
             self.cmergereim = Layers.CMergeReIm()
 
         self.hidden_layers = []
 
-        for u in units:
+        for u in range(len(units)):
             self.hidden_layers.append(
-                Layers.CDense(units=u, lreg=lreg, imean=imean, istddev=istddev)
+                Layers.CDense(units=units[u], lreg=lreg, imean=imean, istddev=istddev)
             )
 
-            if n == 0 or m == 0:
+            if n[u] == -1 or m[u] == -1:
+                pass
+            elif n[u] == 0 or m[u] == 0:
                 self.hidden_layers.append(Layers.CReLUAF())
             else:
                 self.hidden_layers.append(
                     Layers.CPadeAF(
-                        deg_num=n,
-                        deg_den=m,
+                        deg_num=n[u],
+                        deg_den=m[u],
                         lreg=lreg,
-                        alphas=Utils.get_alphas(n, m, safe=safe),
+                        alphas=Utils.get_alphas(n[u], m[u], safe=safe[u]),
                         safe=safe,
                     )
                 )
 
-            if dropout_rate != 0.0 and u > 1:
+            if dropout_rate != 0.0 and u < (len(units) - 1):
                 self.hidden_layers.append(Layers.CDropout(rate=dropout_rate))
 
         self.csplitreim = Layers.CSplitReIm()
